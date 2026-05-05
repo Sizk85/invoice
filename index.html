@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Invoice / Quotation Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --bg: #f3f4f6;
+    --panel: #ffffff;
+    --border: #e5e7eb;
+    --text: #111827;
+    --muted: #6b7280;
+    --success: #10b981;
+    --danger: #ef4444;
+  }
+  body {
+    font-family: 'Sarabun', 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+  .app {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    padding: 1rem;
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+  .panel {
+    background: var(--panel);
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    padding: 1.5rem;
+  }
+  .form-panel { max-height: calc(100vh - 2rem); overflow-y: auto; }
+  .preview-panel { position: sticky; top: 1rem; height: fit-content; }
+
+  .toolbar {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .seg {
+    display: inline-flex;
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 3px;
+  }
+  .seg button {
+    border: none;
+    background: transparent;
+    padding: 6px 14px;
+    font: inherit;
+    cursor: pointer;
+    border-radius: 6px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .seg button.active {
+    background: var(--panel);
+    color: var(--text);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+  }
+
+  .btn {
+    border: none;
+    background: var(--primary);
+    color: white;
+    padding: 8px 18px;
+    border-radius: 8px;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn:hover { background: var(--primary-dark); }
+  .btn-secondary {
+    background: var(--panel);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover { background: var(--bg); }
+  .btn-danger { background: transparent; color: var(--danger); padding: 4px 8px; }
+  .btn-danger:hover { background: #fee2e2; }
+  .ml-auto { margin-left: auto; }
+
+  h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 1.5rem 0 0.75rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  h2:first-of-type { margin-top: 0; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+  .field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 0.75rem; }
+  .field label { font-size: 0.85rem; color: var(--muted); font-weight: 500; }
+  .field input, .field textarea, .field select {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font: inherit;
+    background: white;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+  }
+  .field textarea { resize: vertical; min-height: 60px; font-family: inherit; }
+
+  .items-table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
+  .items-table th {
+    text-align: left;
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-weight: 500;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .items-table th:nth-child(2),
+  .items-table th:nth-child(3),
+  .items-table th:nth-child(4) { text-align: right; }
+  .items-table td { padding: 4px; }
+  .items-table input {
+    width: 100%;
+    border: 1px solid transparent;
+    background: transparent;
+    padding: 6px 8px;
+    border-radius: 4px;
+    font: inherit;
+  }
+  .items-table input:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: white;
+  }
+  .items-table input[type="number"] { text-align: right; }
+  .line-total { padding: 6px 8px; text-align: right; color: var(--muted); }
+
+  .totals-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 0.95rem; }
+  .totals-row.grand { border-top: 2px solid var(--text); margin-top: 8px; padding-top: 10px; font-weight: 700; font-size: 1.1rem; }
+  .checkbox-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; }
+
+  /* Logo upload */
+  .logo-upload {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px;
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+  }
+  .logo-upload img { max-width: 80px; max-height: 60px; border-radius: 4px; }
+
+  /* ====== Document Preview (A4) ====== */
+  .doc {
+    background: white;
+    color: #111;
+    width: 210mm;
+    min-height: 297mm;
+    padding: 15mm;
+    margin: 0 auto;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transform-origin: top center;
+    transform: scale(0.7);
+    margin-bottom: -30%;
+  }
+  @media (max-width: 1400px) { .doc { transform: scale(0.6); margin-bottom: -40%; } }
+
+  .doc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 3px solid var(--primary);
+    padding-bottom: 16px;
+    margin-bottom: 24px;
+  }
+  .doc-header .left { flex: 1; }
+  .doc-header .left img { max-width: 120px; max-height: 80px; margin-bottom: 8px; }
+  .doc-header .left .company-name { font-size: 1.4rem; font-weight: 700; }
+  .doc-header .left .company-meta { font-size: 0.85rem; color: #555; white-space: pre-line; margin-top: 4px; }
+  .doc-header .right { text-align: right; }
+  .doc-title { font-size: 2rem; font-weight: 700; color: var(--primary); letter-spacing: 0.05em; }
+  .doc-meta { font-size: 0.9rem; margin-top: 8px; }
+  .doc-meta div { display: flex; justify-content: space-between; gap: 16px; }
+  .doc-meta span:first-child { color: #555; }
+
+  .billto {
+    margin-bottom: 24px;
+    padding: 12px 16px;
+    background: #f9fafb;
+    border-radius: 6px;
+  }
+  .billto .label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+  .billto .name { font-weight: 700; font-size: 1.05rem; }
+  .billto .meta { font-size: 0.85rem; color: #555; white-space: pre-line; margin-top: 2px; }
+
+  .doc-items { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+  .doc-items th {
+    background: var(--primary);
+    color: white;
+    padding: 10px 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  .doc-items th:nth-child(2),
+  .doc-items th:nth-child(3),
+  .doc-items th:nth-child(4) { text-align: right; }
+  .doc-items td { padding: 10px 12px; border-bottom: 1px solid #e5e7eb; font-size: 0.9rem; }
+  .doc-items td:nth-child(2),
+  .doc-items td:nth-child(3),
+  .doc-items td:nth-child(4) { text-align: right; }
+
+  .doc-totals { margin-left: auto; width: 280px; }
+  .doc-totals .row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 0.95rem; }
+  .doc-totals .row.grand { border-top: 2px solid #111; margin-top: 6px; padding-top: 10px; font-weight: 700; font-size: 1.15rem; color: var(--primary); }
+
+  .doc-notes { margin-top: 32px; padding-top: 16px; border-top: 1px solid #e5e7eb; }
+  .doc-notes .label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+  .doc-notes .text { font-size: 0.85rem; color: #444; white-space: pre-line; }
+
+  /* Mobile */
+  @media (max-width: 900px) {
+    .app { grid-template-columns: 1fr; }
+    .preview-panel { position: static; }
+    .doc { transform: scale(0.4); margin-bottom: -55%; }
+  }
+
+  /* Print */
+  @media print {
+    body { background: white; }
+    .app { display: block; padding: 0; max-width: none; }
+    .form-panel, .preview-panel-toolbar { display: none !important; }
+    .preview-panel { box-shadow: none; padding: 0; position: static; }
+    .panel { box-shadow: none; padding: 0; border-radius: 0; }
+    .doc {
+      transform: none;
+      margin: 0;
+      box-shadow: none;
+      width: 100%;
+      min-height: auto;
+      padding: 0;
+    }
+    @page { size: A4; margin: 15mm; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ============ FORM PANEL ============ -->
+  <div class="panel form-panel">
+    <div class="toolbar">
+      <div class="seg" id="docTypeSeg">
+        <button data-val="invoice" class="active">Invoice</button>
+        <button data-val="quotation">Quotation</button>
+      </div>
+      <div class="seg" id="langSeg">
+        <button data-val="th" class="active">ไทย</button>
+        <button data-val="en">EN</button>
+      </div>
+      <button class="btn ml-auto" id="btnPrint" data-i18n="savePdf">Save PDF</button>
+    </div>
+
+    <h2 data-i18n="docInfo">ข้อมูลเอกสาร</h2>
+    <div class="grid-2">
+      <div class="field">
+        <label data-i18n="docNumber">เลขที่</label>
+        <input type="text" data-bind="docNumber" placeholder="INV-2026-001">
+      </div>
+      <div class="field">
+        <label data-i18n="date">วันที่</label>
+        <input type="date" data-bind="docDate">
+      </div>
+      <div class="field">
+        <label data-i18n="dueDate">วันครบกำหนด</label>
+        <input type="date" data-bind="dueDate">
+      </div>
+    </div>
+
+    <h2>
+      <span data-i18n="issuer">ผู้ออก (บริษัทเรา)</span>
+      <button class="btn btn-secondary" id="btnSaveCompany" style="float:right; font-size:0.75rem; padding:4px 10px; text-transform:none; letter-spacing:0;" data-i18n="saveCompany">บันทึกข้อมูลบริษัท</button>
+    </h2>
+    <div class="field">
+      <label data-i18n="logo">โลโก้</label>
+      <div class="logo-upload">
+        <img id="logoPreview" alt="" style="display:none;">
+        <input type="file" id="logoInput" accept="image/*">
+      </div>
+    </div>
+    <div class="field">
+      <label data-i18n="companyName">ชื่อบริษัท</label>
+      <input type="text" data-bind="company.name">
+    </div>
+    <div class="field">
+      <label data-i18n="address">ที่อยู่</label>
+      <textarea data-bind="company.address"></textarea>
+    </div>
+    <div class="grid-2">
+      <div class="field"><label data-i18n="phone">เบอร์โทร</label><input type="text" data-bind="company.phone"></div>
+      <div class="field"><label data-i18n="email">อีเมล</label><input type="email" data-bind="company.email"></div>
+      <div class="field" style="grid-column: span 2;"><label data-i18n="taxId">เลขผู้เสียภาษี</label><input type="text" data-bind="company.taxId"></div>
+    </div>
+
+    <h2 data-i18n="customer">ลูกค้า</h2>
+    <div class="field">
+      <label data-i18n="customerName">ชื่อ</label>
+      <input type="text" data-bind="customer.name">
+    </div>
+    <div class="field">
+      <label data-i18n="address">ที่อยู่</label>
+      <textarea data-bind="customer.address"></textarea>
+    </div>
+    <div class="grid-2">
+      <div class="field"><label data-i18n="phone">เบอร์โทร</label><input type="text" data-bind="customer.phone"></div>
+      <div class="field"><label data-i18n="taxId">เลขผู้เสียภาษี</label><input type="text" data-bind="customer.taxId"></div>
+    </div>
+
+    <h2 data-i18n="items">รายการสินค้า/บริการ</h2>
+    <table class="items-table">
+      <thead>
+        <tr>
+          <th data-i18n="description">รายละเอียด</th>
+          <th data-i18n="qty" style="width:80px;">จำนวน</th>
+          <th data-i18n="unitPrice" style="width:110px;">ราคา/หน่วย</th>
+          <th data-i18n="amount" style="width:110px;">รวม</th>
+          <th style="width:30px;"></th>
+        </tr>
+      </thead>
+      <tbody id="itemsBody"></tbody>
+    </table>
+    <button class="btn btn-secondary" id="btnAddItem" style="margin-top:8px; font-size:0.85rem;" data-i18n="addItem">+ เพิ่มรายการ</button>
+
+    <h2 data-i18n="summary">สรุป</h2>
+    <div class="grid-2">
+      <div class="field">
+        <label data-i18n="discount">ส่วนลด (%)</label>
+        <input type="number" data-bind="discountPct" min="0" max="100" step="0.01" value="0">
+      </div>
+      <div class="field">
+        <label>&nbsp;</label>
+        <div class="checkbox-row">
+          <input type="checkbox" id="vatToggle" data-bind="vatEnabled">
+          <label for="vatToggle" data-i18n="vatLabel">VAT 7%</label>
+        </div>
+      </div>
+    </div>
+    <div class="field">
+      <label data-i18n="notes">หมายเหตุ / เงื่อนไขการชำระเงิน</label>
+      <textarea data-bind="notes" rows="3"></textarea>
+    </div>
+  </div>
+
+  <!-- ============ PREVIEW PANEL ============ -->
+  <div class="panel preview-panel">
+    <div class="doc" id="doc">
+      <!-- rendered by JS -->
+    </div>
+  </div>
+
+</div>
+
+<script>
+const i18n = {
+  th: {
+    invoice: 'ใบแจ้งหนี้', quotation: 'ใบเสนอราคา',
+    docInfo: 'ข้อมูลเอกสาร',
+    docNumber: 'เลขที่', date: 'วันที่', dueDate: 'วันครบกำหนด', expiryDate: 'วันหมดอายุ',
+    issuer: 'ผู้ออก (บริษัทเรา)', saveCompany: 'บันทึกข้อมูลบริษัท',
+    logo: 'โลโก้', companyName: 'ชื่อบริษัท',
+    address: 'ที่อยู่', phone: 'เบอร์โทร', email: 'อีเมล', taxId: 'เลขผู้เสียภาษี',
+    customer: 'ลูกค้า', customerName: 'ชื่อ',
+    items: 'รายการสินค้า/บริการ',
+    description: 'รายละเอียด', qty: 'จำนวน', unitPrice: 'ราคา/หน่วย', amount: 'รวม',
+    addItem: '+ เพิ่มรายการ',
+    summary: 'สรุป', discount: 'ส่วนลด (%)', vatLabel: 'VAT 7%',
+    notes: 'หมายเหตุ / เงื่อนไขการชำระเงิน',
+    savePdf: 'บันทึก PDF',
+    billTo: 'ลูกค้า', from: 'ผู้ออก',
+    subtotal: 'ยอดรวม', discountAmt: 'ส่วนลด', vat: 'ภาษีมูลค่าเพิ่ม (7%)', total: 'ยอดสุทธิ',
+    currency: '฿', savedMsg: 'บันทึกข้อมูลบริษัทแล้ว'
+  },
+  en: {
+    invoice: 'INVOICE', quotation: 'QUOTATION',
+    docInfo: 'Document Info',
+    docNumber: 'No.', date: 'Date', dueDate: 'Due Date', expiryDate: 'Valid Until',
+    issuer: 'Issuer (Your Company)', saveCompany: 'Save Company Info',
+    logo: 'Logo', companyName: 'Company Name',
+    address: 'Address', phone: 'Phone', email: 'Email', taxId: 'Tax ID',
+    customer: 'Customer', customerName: 'Name',
+    items: 'Items',
+    description: 'Description', qty: 'Qty', unitPrice: 'Unit Price', amount: 'Amount',
+    addItem: '+ Add Item',
+    summary: 'Summary', discount: 'Discount (%)', vatLabel: 'VAT 7%',
+    notes: 'Notes / Payment Terms',
+    savePdf: 'Save PDF',
+    billTo: 'Bill To', from: 'From',
+    subtotal: 'Subtotal', discountAmt: 'Discount', vat: 'VAT (7%)', total: 'Total',
+    currency: '฿', savedMsg: 'Company info saved'
+  }
+};
+
+const STORAGE_KEY = 'invoiceApp.company.v1';
+
+const state = {
+  docType: 'invoice',
+  lang: 'th',
+  docNumber: '',
+  docDate: new Date().toISOString().slice(0, 10),
+  dueDate: '',
+  company: { name: '', address: '', phone: '', email: '', taxId: '', logoDataUrl: '' },
+  customer: { name: '', address: '', phone: '', taxId: '' },
+  items: [{ description: '', qty: 1, unitPrice: 0 }],
+  discountPct: 0,
+  vatEnabled: false,
+  notes: ''
+};
+
+// ---- helpers ----
+const $ = sel => document.querySelector(sel);
+const $$ = sel => document.querySelectorAll(sel);
+const fmt = n => Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const t = key => i18n[state.lang][key] || key;
+const esc = s => String(s ?? '').replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+const nl2br = s => esc(s).replace(/\n/g, '<br>');
+
+function setNested(obj, path, val) {
+  const parts = path.split('.');
+  let o = obj;
+  for (let i = 0; i < parts.length - 1; i++) o = o[parts[i]];
+  o[parts[parts.length - 1]] = val;
+}
+function getNested(obj, path) {
+  return path.split('.').reduce((o, k) => (o ? o[k] : undefined), obj);
+}
+
+// ---- LocalStorage ----
+function loadCompany() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const saved = JSON.parse(raw);
+      Object.assign(state.company, saved);
+    }
+  } catch (e) { /* ignore corrupted */ }
+}
+function saveCompany() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state.company));
+  alert(t('savedMsg'));
+}
+
+// ---- totals ----
+function computeTotals() {
+  const subtotal = state.items.reduce((s, it) => s + (Number(it.qty) || 0) * (Number(it.unitPrice) || 0), 0);
+  const discountAmt = subtotal * (Number(state.discountPct) || 0) / 100;
+  const afterDiscount = subtotal - discountAmt;
+  const vat = state.vatEnabled ? afterDiscount * 0.07 : 0;
+  const total = afterDiscount + vat;
+  return { subtotal, discountAmt, vat, total };
+}
+
+// ---- Form rendering ----
+function renderItemsForm() {
+  const tbody = $('#itemsBody');
+  tbody.innerHTML = state.items.map((it, i) => `
+    <tr>
+      <td><input type="text" value="${esc(it.description)}" data-item="${i}" data-key="description"></td>
+      <td><input type="number" value="${it.qty}" data-item="${i}" data-key="qty" min="0" step="any"></td>
+      <td><input type="number" value="${it.unitPrice}" data-item="${i}" data-key="unitPrice" min="0" step="any"></td>
+      <td class="line-total">${fmt((it.qty || 0) * (it.unitPrice || 0))}</td>
+      <td><button class="btn btn-danger" data-remove="${i}" title="remove">×</button></td>
+    </tr>
+  `).join('');
+}
+
+function applyI18nToForm() {
+  $$('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (i18n[state.lang][key]) el.textContent = t(key);
+  });
+}
+
+function syncFormFromState() {
+  $$('[data-bind]').forEach(el => {
+    const path = el.getAttribute('data-bind');
+    const v = getNested(state, path);
+    if (el.type === 'checkbox') el.checked = !!v;
+    else el.value = v ?? '';
+  });
+  if (state.company.logoDataUrl) {
+    $('#logoPreview').src = state.company.logoDataUrl;
+    $('#logoPreview').style.display = '';
+  }
+}
+
+// ---- Preview rendering ----
+function renderPreview() {
+  const totals = computeTotals();
+  const lang = state.lang;
+  const dueLabel = state.docType === 'invoice' ? t('dueDate') : t('expiryDate');
+  const docTitle = state.docType === 'invoice' ? t('invoice') : t('quotation');
+
+  const itemsHtml = state.items.map(it => `
+    <tr>
+      <td>${nl2br(it.description)}</td>
+      <td>${fmt(it.qty)}</td>
+      <td>${fmt(it.unitPrice)}</td>
+      <td>${fmt((it.qty || 0) * (it.unitPrice || 0))}</td>
+    </tr>
+  `).join('');
+
+  const c = state.company;
+  const cu = state.customer;
+  const companyMeta = [c.address, c.phone && `${t('phone')}: ${c.phone}`, c.email && `${t('email')}: ${c.email}`, c.taxId && `${t('taxId')}: ${c.taxId}`]
+    .filter(Boolean).join('\n');
+  const customerMeta = [cu.address, cu.phone && `${t('phone')}: ${cu.phone}`, cu.taxId && `${t('taxId')}: ${cu.taxId}`]
+    .filter(Boolean).join('\n');
+
+  $('#doc').innerHTML = `
+    <div class="doc-header">
+      <div class="left">
+        ${c.logoDataUrl ? `<img src="${c.logoDataUrl}" alt="logo">` : ''}
+        <div class="company-name">${esc(c.name) || '&nbsp;'}</div>
+        <div class="company-meta">${nl2br(companyMeta)}</div>
+      </div>
+      <div class="right">
+        <div class="doc-title">${docTitle}</div>
+        <div class="doc-meta">
+          <div><span>${t('docNumber')}</span><strong>${esc(state.docNumber) || '-'}</strong></div>
+          <div><span>${t('date')}</span><strong>${esc(state.docDate) || '-'}</strong></div>
+          ${state.dueDate ? `<div><span>${dueLabel}</span><strong>${esc(state.dueDate)}</strong></div>` : ''}
+        </div>
+      </div>
+    </div>
+
+    <div class="billto">
+      <div class="label">${t('billTo')}</div>
+      <div class="name">${esc(cu.name) || '&nbsp;'}</div>
+      <div class="meta">${nl2br(customerMeta)}</div>
+    </div>
+
+    <table class="doc-items">
+      <thead>
+        <tr>
+          <th>${t('description')}</th>
+          <th>${t('qty')}</th>
+          <th>${t('unitPrice')}</th>
+          <th>${t('amount')}</th>
+        </tr>
+      </thead>
+      <tbody>${itemsHtml}</tbody>
+    </table>
+
+    <div class="doc-totals">
+      <div class="row"><span>${t('subtotal')}</span><span>${t('currency')}${fmt(totals.subtotal)}</span></div>
+      ${state.discountPct > 0 ? `<div class="row"><span>${t('discountAmt')} (${state.discountPct}%)</span><span>-${t('currency')}${fmt(totals.discountAmt)}</span></div>` : ''}
+      ${state.vatEnabled ? `<div class="row"><span>${t('vat')}</span><span>${t('currency')}${fmt(totals.vat)}</span></div>` : ''}
+      <div class="row grand"><span>${t('total')}</span><span>${t('currency')}${fmt(totals.total)}</span></div>
+    </div>
+
+    ${state.notes ? `
+      <div class="doc-notes">
+        <div class="label">${t('notes')}</div>
+        <div class="text">${nl2br(state.notes)}</div>
+      </div>
+    ` : ''}
+  `;
+}
+
+function renderAll() {
+  applyI18nToForm();
+  renderPreview();
+}
+
+// ---- Event wiring ----
+function setupListeners() {
+  // Bound inputs
+  document.addEventListener('input', (e) => {
+    const el = e.target;
+    if (el.matches('[data-bind]')) {
+      const path = el.getAttribute('data-bind');
+      let val;
+      if (el.type === 'checkbox') val = el.checked;
+      else if (el.type === 'number') val = Number(el.value);
+      else val = el.value;
+      setNested(state, path, val);
+      renderPreview();
+    }
+    if (el.matches('[data-item]')) {
+      const i = Number(el.getAttribute('data-item'));
+      const key = el.getAttribute('data-key');
+      const val = el.type === 'number' ? Number(el.value) : el.value;
+      state.items[i][key] = val;
+      // update line total inline without full re-render of items
+      const row = el.closest('tr');
+      const it = state.items[i];
+      row.querySelector('.line-total').textContent = fmt((it.qty || 0) * (it.unitPrice || 0));
+      renderPreview();
+    }
+  });
+
+  // Remove item
+  document.addEventListener('click', (e) => {
+    const rm = e.target.closest('[data-remove]');
+    if (rm) {
+      const i = Number(rm.getAttribute('data-remove'));
+      state.items.splice(i, 1);
+      if (state.items.length === 0) state.items.push({ description: '', qty: 1, unitPrice: 0 });
+      renderItemsForm();
+      renderPreview();
+    }
+  });
+
+  // Add item
+  $('#btnAddItem').addEventListener('click', () => {
+    state.items.push({ description: '', qty: 1, unitPrice: 0 });
+    renderItemsForm();
+    renderPreview();
+  });
+
+  // Doc type segment
+  $('#docTypeSeg').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-val]');
+    if (!b) return;
+    state.docType = b.getAttribute('data-val');
+    $$('#docTypeSeg button').forEach(x => x.classList.toggle('active', x === b));
+    renderPreview();
+  });
+
+  // Lang segment
+  $('#langSeg').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-val]');
+    if (!b) return;
+    state.lang = b.getAttribute('data-val');
+    $$('#langSeg button').forEach(x => x.classList.toggle('active', x === b));
+    document.documentElement.lang = state.lang;
+    renderAll();
+  });
+
+  // Save company
+  $('#btnSaveCompany').addEventListener('click', saveCompany);
+
+  // Print
+  $('#btnPrint').addEventListener('click', () => window.print());
+
+  // Logo upload
+  $('#logoInput').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      state.company.logoDataUrl = reader.result;
+      $('#logoPreview').src = reader.result;
+      $('#logoPreview').style.display = '';
+      renderPreview();
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ---- Init ----
+loadCompany();
+syncFormFromState();
+renderItemsForm();
+setupListeners();
+renderAll();
+</script>
+</body>
+</html>
