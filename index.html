@@ -7,6 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -15,7 +17,7 @@
     --accent: #b8956a;
     --bg: #f0eee8;
     --panel: #ffffff;
-    --paper: #fafaf5;
+    --paper: #ffffff;
     --border: #d6d3c7;
     --text: #1a1a1a;
     --muted: #6b6960;
@@ -178,9 +180,7 @@
 
   /* ====== Document Preview — Editorial Luxury ====== */
   .doc {
-    background:
-      linear-gradient(135deg, transparent 0%, rgba(184, 149, 106, 0.015) 100%),
-      var(--paper);
+    background: #ffffff;
     color: #1a1a1a;
     width: 210mm;
     min-height: 297mm;
@@ -198,17 +198,7 @@
     font-size: 10pt;
     line-height: 1.55;
   }
-  /* subtle paper grain */
-  .doc::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background-image:
-      radial-gradient(circle at 20% 30%, rgba(0,0,0,0.012) 0%, transparent 40%),
-      radial-gradient(circle at 80% 70%, rgba(184, 149, 106, 0.025) 0%, transparent 40%);
-    mix-blend-mode: multiply;
-  }
+  /* paper grain removed for clean white background */
   /* corner accent mark */
   .doc::after {
     content: '';
@@ -280,6 +270,16 @@
     color: var(--text);
     letter-spacing: -0.025em;
     font-variation-settings: 'opsz' 144, 'SOFT' 100;
+  }
+  /* Thai title: Fraunces lacks Thai glyphs, use Plex Sans Thai upright */
+  :lang(th) .doc-title,
+  html[lang="th"] .doc-title {
+    font-family: 'IBM Plex Sans Thai', 'IBM Plex Serif', serif;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 32pt;
+    letter-spacing: 0;
+    font-variation-settings: normal;
   }
   .doc-title .ampersand {
     font-family: 'Fraunces', serif;
@@ -518,7 +518,7 @@
     padding: 1rem 1.25rem;
     border: 1px solid var(--border);
     border-radius: 8px;
-    background: rgba(184, 149, 106, 0.06);
+    background: #ffffff;
     display: grid;
     grid-template-columns: 1fr auto;
     gap: 1rem;
@@ -615,11 +615,15 @@
 
   /* Print */
   @media print {
-    body { background: white; }
+    html, body {
+      background: white !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
     .app { display: block; padding: 0; max-width: none; }
-    .form-panel, .preview-panel-toolbar { display: none !important; }
+    .form-panel, .preview-panel-toolbar, .modal-overlay { display: none !important; }
     .preview-panel { box-shadow: none; padding: 0; position: static; }
-    .panel { box-shadow: none; padding: 0; border-radius: 0; }
+    .panel { box-shadow: none; padding: 0; border-radius: 0; background: transparent; }
     .doc {
       transform: none;
       margin: 0;
@@ -627,8 +631,12 @@
       width: 100%;
       min-height: auto;
       padding: 0;
+      background: white;
     }
-    @page { size: A4; margin: 15mm; }
+    .doc-payment {
+      background: #ffffff !important;
+    }
+    @page { size: A4; margin: 12mm; }
   }
 </style>
 </head>
@@ -1831,8 +1839,65 @@ function setupListeners() {
   // Save company
   $('#btnSaveCompany').addEventListener('click', saveCompany);
 
-  // Print
-  $('#btnPrint').addEventListener('click', () => window.print());
+  // Save PDF — generate via html2canvas + jsPDF directly (no browser print dialog)
+  $('#btnPrint').addEventListener('click', async () => {
+    const docEl = document.getElementById('doc');
+    if (!docEl) return;
+    if (typeof html2canvas === 'undefined' || typeof jspdf === 'undefined') {
+      alert('PDF library failed to load — falling back to browser print.');
+      window.print();
+      return;
+    }
+    const btn = $('#btnPrint');
+    const originalLabel = btn.textContent;
+    btn.textContent = '...';
+    btn.disabled = true;
+    try {
+      const canvas = await html2canvas(docEl, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        logging: false
+      });
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      const pdf = new jspdf.jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      const margin = 10;
+      const imgW = pageW - margin * 2;
+      const imgH = (canvas.height * imgW) / canvas.width;
+
+      if (imgH <= pageH - margin * 2) {
+        pdf.addImage(imgData, 'JPEG', margin, margin, imgW, imgH);
+      } else {
+        // multi-page: slice the canvas vertically
+        const sliceHeightPx = (pageH - margin * 2) * canvas.width / imgW;
+        let yPx = 0;
+        let pageIdx = 0;
+        while (yPx < canvas.height) {
+          const sliceCanvas = document.createElement('canvas');
+          sliceCanvas.width = canvas.width;
+          sliceCanvas.height = Math.min(sliceHeightPx, canvas.height - yPx);
+          const ctx = sliceCanvas.getContext('2d');
+          ctx.drawImage(canvas, 0, yPx, canvas.width, sliceCanvas.height, 0, 0, canvas.width, sliceCanvas.height);
+          const sliceData = sliceCanvas.toDataURL('image/jpeg', 0.95);
+          const sliceH = (sliceCanvas.height * imgW) / canvas.width;
+          if (pageIdx > 0) pdf.addPage();
+          pdf.addImage(sliceData, 'JPEG', margin, margin, imgW, sliceH);
+          yPx += sliceHeightPx;
+          pageIdx++;
+        }
+      }
+
+      const filename = `${state.docNumber || (state.docType === 'invoice' ? 'invoice' : 'quotation')}.pdf`;
+      pdf.save(filename);
+    } catch (err) {
+      alert('PDF error: ' + err.message);
+    } finally {
+      btn.textContent = originalLabel;
+      btn.disabled = false;
+    }
+  });
 
   // Image uploads (logo, signature, stamp, QR)
   function wireImageUpload(inputId, previewId, stateField) {
