@@ -6,26 +6,33 @@
 <title>Invoice / Quotation Generator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --primary: #2563eb;
-    --primary-dark: #1d4ed8;
-    --bg: #f3f4f6;
+    --primary: #1a3a2e;
+    --primary-dark: #0f2419;
+    --accent: #b8956a;
+    --bg: #f0eee8;
     --panel: #ffffff;
-    --border: #e5e7eb;
-    --text: #111827;
-    --muted: #6b7280;
-    --success: #10b981;
-    --danger: #ef4444;
+    --paper: #fafaf5;
+    --border: #d6d3c7;
+    --text: #1a1a1a;
+    --muted: #6b6960;
+    --ink-faint: #94918a;
+    --rule: #1a1a1a;
+    --danger: #b04545;
   }
   body {
-    font-family: 'Sarabun', 'Inter', sans-serif;
-    background: var(--bg);
+    font-family: 'Manrope', 'IBM Plex Sans Thai', sans-serif;
+    background:
+      radial-gradient(ellipse at top left, rgba(184, 149, 106, 0.08), transparent 50%),
+      radial-gradient(ellipse at bottom right, rgba(26, 58, 46, 0.06), transparent 50%),
+      var(--bg);
     color: var(--text);
     line-height: 1.5;
     min-height: 100vh;
+    font-feature-settings: 'ss01', 'cv11';
   }
   .app {
     display: grid;
@@ -169,73 +176,435 @@
   }
   .logo-upload img { max-width: 80px; max-height: 60px; border-radius: 4px; }
 
-  /* ====== Document Preview (A4) ====== */
+  /* ====== Document Preview — Editorial Luxury ====== */
   .doc {
-    background: white;
-    color: #111;
+    background:
+      linear-gradient(135deg, transparent 0%, rgba(184, 149, 106, 0.015) 100%),
+      var(--paper);
+    color: #1a1a1a;
     width: 210mm;
     min-height: 297mm;
-    padding: 15mm;
+    padding: 22mm 20mm 24mm;
     margin: 0 auto;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    box-shadow:
+      0 1px 2px rgba(0,0,0,0.04),
+      0 12px 40px -12px rgba(0,0,0,0.18),
+      0 0 0 1px rgba(0,0,0,0.04);
     transform-origin: top center;
-    transform: scale(0.7);
-    margin-bottom: -30%;
+    transform: scale(0.72);
+    margin-bottom: -28%;
+    position: relative;
+    font-family: 'Manrope', 'IBM Plex Sans Thai', sans-serif;
+    font-size: 10pt;
+    line-height: 1.55;
   }
-  @media (max-width: 1400px) { .doc { transform: scale(0.6); margin-bottom: -40%; } }
-
-  .doc-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    border-bottom: 3px solid var(--primary);
-    padding-bottom: 16px;
-    margin-bottom: 24px;
+  /* subtle paper grain */
+  .doc::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(0,0,0,0.012) 0%, transparent 40%),
+      radial-gradient(circle at 80% 70%, rgba(184, 149, 106, 0.025) 0%, transparent 40%);
+    mix-blend-mode: multiply;
   }
-  .doc-header .left { flex: 1; }
-  .doc-header .left img { max-width: 120px; max-height: 80px; margin-bottom: 8px; }
-  .doc-header .left .company-name { font-size: 1.4rem; font-weight: 700; }
-  .doc-header .left .company-meta { font-size: 0.85rem; color: #555; white-space: pre-line; margin-top: 4px; }
-  .doc-header .right { text-align: right; }
-  .doc-title { font-size: 2rem; font-weight: 700; color: var(--primary); letter-spacing: 0.05em; }
-  .doc-meta { font-size: 0.9rem; margin-top: 8px; }
-  .doc-meta div { display: flex; justify-content: space-between; gap: 16px; }
-  .doc-meta span:first-child { color: #555; }
-
-  .billto {
-    margin-bottom: 24px;
-    padding: 12px 16px;
-    background: #f9fafb;
-    border-radius: 6px;
+  /* corner accent mark */
+  .doc::after {
+    content: '';
+    position: absolute;
+    top: 14mm; right: 14mm;
+    width: 6mm; height: 6mm;
+    border-top: 0.5pt solid var(--accent);
+    border-right: 0.5pt solid var(--accent);
+    pointer-events: none;
   }
-  .billto .label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
-  .billto .name { font-weight: 700; font-size: 1.05rem; }
-  .billto .meta { font-size: 0.85rem; color: #555; white-space: pre-line; margin-top: 2px; }
 
-  .doc-items { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
-  .doc-items th {
-    background: var(--primary);
-    color: white;
-    padding: 10px 12px;
-    text-align: left;
+  @media (max-width: 1400px) { .doc { transform: scale(0.62); margin-bottom: -38%; } }
+
+  /* ===== HERO HEADER ===== */
+  .doc-hero {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 20px;
+    align-items: end;
+    padding-bottom: 18px;
+    margin-bottom: 28px;
+    border-bottom: 0.75pt solid var(--rule);
+    position: relative;
+  }
+  .doc-hero .brand { min-width: 0; }
+  .doc-hero .brand img {
+    max-width: 110px;
+    max-height: 60px;
+    margin-bottom: 12px;
+    object-fit: contain;
+  }
+  .doc-hero .brand .company-name {
+    font-family: 'Fraunces', 'IBM Plex Serif', serif;
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 18pt;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    color: var(--text);
+    font-variation-settings: 'opsz' 144, 'SOFT' 50;
   }
+  .doc-hero .brand .company-meta {
+    font-size: 8.5pt;
+    color: var(--muted);
+    white-space: pre-line;
+    margin-top: 8px;
+    line-height: 1.6;
+    max-width: 280px;
+  }
+
+  .doc-hero .stamp {
+    text-align: right;
+    align-self: start;
+  }
+  .doc-hero .stamp .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7pt;
+    letter-spacing: 0.25em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .doc-title {
+    font-family: 'Fraunces', 'IBM Plex Serif', serif;
+    font-style: italic;
+    font-size: 36pt;
+    line-height: 0.92;
+    font-weight: 400;
+    color: var(--text);
+    letter-spacing: -0.025em;
+    font-variation-settings: 'opsz' 144, 'SOFT' 100;
+  }
+  .doc-title .ampersand {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--accent);
+    font-weight: 300;
+    margin: 0 2px;
+  }
+
+  /* ===== META STRIP ===== */
+  .doc-meta-strip {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    margin-bottom: 28px;
+    border-top: 0.25pt solid var(--border);
+    border-bottom: 0.25pt solid var(--border);
+    padding: 10px 0;
+  }
+  .doc-meta-strip .cell { padding: 0 14px; border-right: 0.25pt solid var(--border); }
+  .doc-meta-strip .cell:first-child { padding-left: 0; }
+  .doc-meta-strip .cell:last-child { border-right: none; padding-right: 0; }
+  .doc-meta-strip .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 6.5pt;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+  .doc-meta-strip .value {
+    font-family: 'Fraunces', serif;
+    font-size: 11.5pt;
+    font-weight: 500;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum';
+  }
+
+  /* ===== BILL TO ===== */
+  .billto {
+    margin-bottom: 32px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+  .billto .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7pt;
+    letter-spacing: 0.25em;
+    color: var(--muted);
+    text-transform: uppercase;
+    font-weight: 500;
+    padding-top: 4px;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    border-right: 0.5pt solid var(--accent);
+    padding-right: 8px;
+    white-space: nowrap;
+  }
+  .billto .body { padding-left: 4px; }
+  .billto .name {
+    font-family: 'Fraunces', 'IBM Plex Serif', serif;
+    font-weight: 500;
+    font-size: 14pt;
+    color: var(--text);
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+  }
+  .billto .meta {
+    font-size: 9pt;
+    color: var(--muted);
+    white-space: pre-line;
+    margin-top: 6px;
+    line-height: 1.6;
+  }
+
+  /* ===== ITEMS TABLE ===== */
+  .doc-items {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 28px;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum';
+  }
+  .doc-items thead tr {
+    border-top: 0.5pt solid var(--rule);
+    border-bottom: 0.5pt solid var(--rule);
+  }
+  .doc-items th {
+    background: transparent;
+    color: var(--text);
+    padding: 10px 8px;
+    text-align: left;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    font-size: 7pt;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+  .doc-items th:first-child { padding-left: 0; }
+  .doc-items th:last-child { padding-right: 0; }
   .doc-items th:nth-child(2),
   .doc-items th:nth-child(3),
   .doc-items th:nth-child(4) { text-align: right; }
-  .doc-items td { padding: 10px 12px; border-bottom: 1px solid #e5e7eb; font-size: 0.9rem; }
+  .doc-items td {
+    padding: 12px 8px;
+    border-bottom: 0.25pt solid var(--border);
+    font-size: 9.5pt;
+    vertical-align: top;
+  }
+  .doc-items td:first-child {
+    padding-left: 0;
+    font-family: 'Fraunces', 'IBM Plex Serif', serif;
+    font-size: 10.5pt;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: -0.005em;
+  }
+  .doc-items td:last-child { padding-right: 0; }
   .doc-items td:nth-child(2),
   .doc-items td:nth-child(3),
-  .doc-items td:nth-child(4) { text-align: right; }
+  .doc-items td:nth-child(4) {
+    text-align: right;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5pt;
+    font-weight: 400;
+    color: var(--text);
+  }
+  .doc-items td:nth-child(4) { font-weight: 500; }
+  .doc-items tbody tr:hover { background: rgba(184, 149, 106, 0.04); }
 
-  .doc-totals { margin-left: auto; width: 280px; }
-  .doc-totals .row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 0.95rem; }
-  .doc-totals .row.grand { border-top: 2px solid #111; margin-top: 6px; padding-top: 10px; font-weight: 700; font-size: 1.15rem; color: var(--primary); }
+  /* row index decoration (small ornamental) */
+  .doc-items td:first-child::before {
+    content: counter(row-num, decimal-leading-zero);
+    counter-increment: row-num;
+    display: inline-block;
+    margin-right: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7pt;
+    color: var(--accent);
+    font-weight: 500;
+    vertical-align: middle;
+    letter-spacing: 0.1em;
+  }
+  .doc-items tbody { counter-reset: row-num; }
 
-  .doc-notes { margin-top: 32px; padding-top: 16px; border-top: 1px solid #e5e7eb; }
-  .doc-notes .label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
-  .doc-notes .text { font-size: 0.85rem; color: #444; white-space: pre-line; }
+  /* ===== TOTALS ===== */
+  .doc-bottom {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 32px;
+    align-items: start;
+    margin-top: 8px;
+  }
+  .doc-totals {
+    width: 280px;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum';
+  }
+  .doc-totals .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 6px 0;
+    font-size: 9.5pt;
+    color: var(--muted);
+  }
+  .doc-totals .row span:first-child {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7pt;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  .doc-totals .row span:last-child {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text);
+    font-size: 10pt;
+    font-weight: 500;
+  }
+  .doc-totals .row.grand {
+    border-top: 0.5pt solid var(--rule);
+    border-bottom: 2.5pt double var(--rule);
+    margin-top: 8px;
+    padding: 12px 0;
+    align-items: center;
+  }
+  .doc-totals .row.grand span:first-child {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 11pt;
+    color: var(--text);
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  .doc-totals .row.grand span:last-child {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 18pt;
+    color: var(--primary);
+    letter-spacing: -0.01em;
+  }
+
+  /* ===== NOTES ===== */
+  .doc-notes-block {
+    padding-right: 16px;
+    border-left: 0.5pt solid var(--accent);
+    padding-left: 14px;
+    align-self: start;
+  }
+  .doc-notes-block .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7pt;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+  .doc-notes-block .text {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 9.5pt;
+    color: var(--text);
+    white-space: pre-line;
+    line-height: 1.6;
+    font-weight: 400;
+  }
+
+  /* ===== PAYMENT / SIGNATURE ===== */
+  .doc-payment {
+    margin-top: 1.5rem;
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: rgba(184, 149, 106, 0.06);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1rem;
+  }
+  .doc-payment .label {
+    font-family: 'Fraunces', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+  .doc-payment .bank-row {
+    font-size: 0.85rem;
+    margin-bottom: 4px;
+    line-height: 1.4;
+  }
+  .doc-payment .bank-row strong { font-weight: 600; }
+  .doc-payment .promptpay { font-size: 0.85rem; margin-top: 6px; }
+  .doc-payment .qr img { max-width: 110px; height: auto; display: block; }
+  .doc-signature {
+    margin-top: 2rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: end;
+  }
+  .doc-signature .sig-cell { text-align: center; }
+  .doc-signature .sig-cell img { max-height: 80px; max-width: 200px; margin: 0 auto 4px; display: block; }
+  .doc-signature .sig-line {
+    border-top: 1px solid var(--rule);
+    padding-top: 6px;
+    font-size: 0.78rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* ===== HISTORY MODAL ===== */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: none;
+    align-items: center; justify-content: center;
+    z-index: 1000;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--panel);
+    border-radius: 12px;
+    padding: 1.5rem;
+    width: min(800px, 92vw);
+    max-height: 86vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  }
+  .modal h3 { margin-bottom: 1rem; font-family: 'Fraunces', serif; font-size: 1.4rem; }
+  .modal .modal-toolbar { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+  .modal .modal-toolbar input[type="search"] {
+    flex: 1; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border); font: inherit;
+  }
+  .doc-history-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  .doc-history-table th, .doc-history-table td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border); }
+  .doc-history-table th { color: var(--muted); font-weight: 500; }
+  .doc-history-table .actions { display: flex; gap: 4px; flex-wrap: wrap; }
+  .doc-history-table .actions button { padding: 4px 8px; font-size: 0.78rem; border-radius: 4px; }
+  .doc-history-empty { padding: 32px; text-align: center; color: var(--muted); font-style: italic; }
+
+  /* ===== FOOTER MARK ===== */
+  .doc-footer {
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 0.25pt solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 6.5pt;
+    color: var(--ink-faint);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  .doc-footer .ornament {
+    color: var(--accent);
+    letter-spacing: 0.5em;
+  }
 
   /* Mobile */
   @media (max-width: 900px) {
@@ -271,29 +640,69 @@
   <div class="panel form-panel">
     <div class="toolbar">
       <div class="seg" id="docTypeSeg">
-        <button data-val="invoice" class="active">Invoice</button>
-        <button data-val="quotation">Quotation</button>
+        <button data-val="invoice" class="active" data-i18n="invoice">ใบแจ้งหนี้</button>
+        <button data-val="quotation" data-i18n="quotation">ใบเสนอราคา</button>
       </div>
       <div class="seg" id="langSeg">
         <button data-val="th" class="active">ไทย</button>
         <button data-val="en">EN</button>
       </div>
-      <button class="btn ml-auto" id="btnPrint" data-i18n="savePdf">Save PDF</button>
+      <div style="flex:1;"></div>
+      <button class="btn btn-secondary" id="btnNewDoc" data-i18n="newDoc">เอกสารใหม่</button>
+      <button class="btn btn-secondary" id="btnSaveDoc" data-i18n="saveDoc">บันทึกเอกสาร</button>
+      <button class="btn btn-secondary" id="btnHistory" data-i18n="history">ประวัติ</button>
+      <button class="btn btn-secondary" id="btnExport" data-i18n="exportData">Export</button>
+      <button class="btn btn-secondary" id="btnImport" data-i18n="importData">Import</button>
+      <input type="file" id="importInput" accept="application/json" style="display:none;">
+      <button class="btn" id="btnPrint" data-i18n="savePdf">บันทึก PDF</button>
     </div>
 
     <h2 data-i18n="docInfo">ข้อมูลเอกสาร</h2>
     <div class="grid-2">
       <div class="field">
         <label data-i18n="docNumber">เลขที่</label>
-        <input type="text" data-bind="docNumber" placeholder="INV-2026-001">
+        <input type="text" data-bind="docNumber" id="docNumberInput">
+      </div>
+      <div class="field">
+        <label>&nbsp;</label>
+        <div class="checkbox-row">
+          <input type="checkbox" id="autoNumberToggle" data-bind="docNumberAuto">
+          <label for="autoNumberToggle" data-i18n="autoNumber">เลขที่อัตโนมัติ</label>
+        </div>
       </div>
       <div class="field">
         <label data-i18n="date">วันที่</label>
         <input type="date" data-bind="docDate">
       </div>
       <div class="field">
+        <label data-i18n="dueTerm">เงื่อนไขชำระ</label>
+        <select data-bind="dueTerm" id="dueTermSelect">
+          <option value="onreceipt" data-i18n="onreceipt">ชำระทันที</option>
+          <option value="net7" data-i18n="net7">Net 7 วัน</option>
+          <option value="net15" data-i18n="net15">Net 15 วัน</option>
+          <option value="net30" data-i18n="net30" selected>Net 30 วัน</option>
+          <option value="net60" data-i18n="net60">Net 60 วัน</option>
+          <option value="custom" data-i18n="custom">กำหนดเอง</option>
+        </select>
+      </div>
+      <div class="field">
         <label data-i18n="dueDate">วันครบกำหนด</label>
-        <input type="date" data-bind="dueDate">
+        <input type="date" data-bind="dueDate" id="dueDateInput">
+      </div>
+      <div class="field">
+        <label data-i18n="currencyLabel">สกุลเงิน</label>
+        <select data-bind="currency">
+          <option value="THB">฿ THB</option>
+          <option value="USD">$ USD</option>
+          <option value="EUR">€ EUR</option>
+          <option value="JPY">¥ JPY</option>
+          <option value="GBP">£ GBP</option>
+          <option value="CNY">¥ CNY</option>
+        </select>
+      </div>
+      <div class="field" style="grid-column: span 2;">
+        <label data-i18n="referenceLabel">อ้างอิง</label>
+        <input type="text" data-bind="reference" placeholder="QUO-... (optional)">
       </div>
     </div>
 
@@ -306,6 +715,22 @@
       <div class="logo-upload">
         <img id="logoPreview" alt="" style="display:none;">
         <input type="file" id="logoInput" accept="image/*">
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="field">
+        <label data-i18n="signature">ลายเซ็น</label>
+        <div class="logo-upload">
+          <img id="signaturePreview" alt="" style="display:none; max-width:140px;">
+          <input type="file" id="signatureInput" accept="image/*">
+        </div>
+      </div>
+      <div class="field">
+        <label data-i18n="stamp">ตราประทับ</label>
+        <div class="logo-upload">
+          <img id="stampPreview" alt="" style="display:none; max-width:120px;">
+          <input type="file" id="stampInput" accept="image/*">
+        </div>
       </div>
     </div>
     <div class="field">
@@ -334,6 +759,52 @@
     <div class="grid-2">
       <div class="field"><label data-i18n="phone">เบอร์โทร</label><input type="text" data-bind="customer.phone"></div>
       <div class="field"><label data-i18n="taxId">เลขผู้เสียภาษี</label><input type="text" data-bind="customer.taxId"></div>
+    </div>
+
+    <h2 data-i18n="payment">ข้อมูลการชำระเงิน</h2>
+
+    <div class="field">
+      <label data-i18n="bankAccounts">บัญชีธนาคาร</label>
+      <div id="bankAccountsList"></div>
+      <button type="button" class="btn btn-secondary" id="btnAddBank" style="margin-top:6px; font-size:0.85rem;" data-i18n="addBank">+ เพิ่มบัญชี</button>
+    </div>
+
+    <div class="grid-2">
+      <div class="field">
+        <label data-i18n="promptPay">พร้อมเพย์</label>
+        <select data-bind="company.promptPay.type">
+          <option value="phone" data-i18n="promptPayPhone">เบอร์โทร</option>
+          <option value="id" data-i18n="promptPayId">บัตรประชาชน</option>
+          <option value="taxId" data-i18n="promptPayTax">เลขผู้เสียภาษี</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>&nbsp;</label>
+        <input type="text" data-bind="company.promptPay.value" placeholder="081-234-5678">
+      </div>
+    </div>
+
+    <div class="field">
+      <label data-i18n="qrCode">QR Code</label>
+      <div class="logo-upload">
+        <img id="qrPreview" alt="" style="display:none; max-width:120px;">
+        <input type="file" id="qrInput" accept="image/*">
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="field">
+        <div class="checkbox-row">
+          <input type="checkbox" id="showBanksToggle" data-bind="paymentDisplay.showBanks" checked>
+          <label for="showBanksToggle">แสดงบัญชีธนาคาร / Show banks</label>
+        </div>
+      </div>
+      <div class="field">
+        <div class="checkbox-row">
+          <input type="checkbox" id="showQRToggle" data-bind="paymentDisplay.showQR" checked>
+          <label for="showQRToggle">แสดง QR / Show QR</label>
+        </div>
+      </div>
     </div>
 
     <h2 data-i18n="items">รายการสินค้า/บริการ</h2>
@@ -365,6 +836,45 @@
         </div>
       </div>
     </div>
+    <div class="grid-2">
+      <div class="field">
+        <div class="checkbox-row">
+          <input type="checkbox" id="vatInclusiveToggle" data-bind="vatInclusive">
+          <label for="vatInclusiveToggle" data-i18n="vatInclusive">ราคารวม VAT แล้ว</label>
+        </div>
+      </div>
+      <div class="field">
+        <div class="checkbox-row">
+          <input type="checkbox" id="whtToggle" data-bind="withholding.enabled">
+          <label for="whtToggle" data-i18n="withholdingTax">หัก ณ ที่จ่าย</label>
+        </div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="field">
+        <label data-i18n="withholdingRate">อัตรา (%)</label>
+        <select data-bind="withholding.rate">
+          <option value="1">1%</option>
+          <option value="3" selected>3%</option>
+          <option value="5">5%</option>
+        </select>
+      </div>
+      <div class="field"></div>
+    </div>
+    <div class="grid-2">
+      <div class="field">
+        <div class="checkbox-row">
+          <input type="checkbox" id="showSigToggle" data-bind="showSignature">
+          <label for="showSigToggle" data-i18n="showSignature">แสดงลายเซ็น</label>
+        </div>
+      </div>
+      <div class="field">
+        <div class="checkbox-row">
+          <input type="checkbox" id="showStampToggle" data-bind="showStamp">
+          <label for="showStampToggle" data-i18n="showStamp">แสดงตราประทับ</label>
+        </div>
+      </div>
+    </div>
     <div class="field">
       <label data-i18n="notes">หมายเหตุ / เงื่อนไขการชำระเงิน</label>
       <textarea data-bind="notes" rows="3"></textarea>
@@ -378,6 +888,17 @@
     </div>
   </div>
 
+</div>
+
+<div class="modal-overlay" id="historyModal">
+  <div class="modal">
+    <h3 data-i18n="historyTitle">ประวัติเอกสาร</h3>
+    <div class="modal-toolbar">
+      <input type="search" id="historySearch" placeholder="ค้นหา (เลขที่ / ลูกค้า)" data-i18n-placeholder="searchPlaceholder">
+      <button class="btn btn-secondary" id="btnHistoryClose" data-i18n="close">ปิด</button>
+    </div>
+    <div id="historyListContainer"></div>
+  </div>
 </div>
 
 <script>
@@ -398,7 +919,30 @@ const i18n = {
     savePdf: 'บันทึก PDF',
     billTo: 'ลูกค้า', from: 'ผู้ออก',
     subtotal: 'ยอดรวม', discountAmt: 'ส่วนลด', vat: 'ภาษีมูลค่าเพิ่ม (7%)', total: 'ยอดสุทธิ',
-    currency: '฿', savedMsg: 'บันทึกข้อมูลบริษัทแล้ว'
+    currency: '฿', savedMsg: 'บันทึกข้อมูลบริษัทแล้ว',
+    payment: 'ข้อมูลการชำระเงิน', bankAccounts: 'บัญชีธนาคาร', bankName: 'ธนาคาร',
+    accountName: 'ชื่อบัญชี', accountNumber: 'เลขที่บัญชี', branch: 'สาขา',
+    addBank: '+ เพิ่มบัญชี', promptPay: 'พร้อมเพย์', promptPayPhone: 'เบอร์โทร',
+    promptPayId: 'บัตรประชาชน', promptPayTax: 'เลขผู้เสียภาษี', qrCode: 'QR Code',
+    signature: 'ลายเซ็น', stamp: 'ตราประทับ', signatureStamp: 'ลายเซ็น / ตราประทับ',
+    showSignature: 'แสดงลายเซ็น', showStamp: 'แสดงตราประทับ',
+    docSettings: 'ตั้งค่าเอกสาร', autoNumber: 'เลขที่อัตโนมัติ',
+    dueTerm: 'เงื่อนไขชำระ', onreceipt: 'ชำระทันที', net7: 'Net 7 วัน', net15: 'Net 15 วัน',
+    net30: 'Net 30 วัน', net60: 'Net 60 วัน', custom: 'กำหนดเอง',
+    validityTerm: 'อายุใบเสนอราคา',
+    currencyLabel: 'สกุลเงิน', vatInclusive: 'ราคารวม VAT แล้ว',
+    withholdingTax: 'หัก ณ ที่จ่าย', withholdingRate: 'อัตรา (%)',
+    netPayable: 'ยอดสุทธิที่ต้องชำระ',
+    newDoc: 'เอกสารใหม่', saveDoc: 'บันทึกเอกสาร', history: 'ประวัติ',
+    exportData: 'Export', importData: 'Import',
+    historyTitle: 'ประวัติเอกสาร', searchPlaceholder: 'ค้นหา (เลขที่ / ลูกค้า)',
+    noDocs: 'ยังไม่มีเอกสารที่บันทึก', open: 'เปิด', duplicate: 'คัดลอก', remove: 'ลบ',
+    convertToInvoice: 'แปลงเป็นใบแจ้งหนี้', close: 'ปิด',
+    confirmDelete: 'ลบเอกสารนี้?', confirmImport: 'จะแทนที่ข้อมูลปัจจุบันทั้งหมด ดำเนินการต่อ?',
+    docSavedMsg: 'บันทึกเอกสารแล้ว', importSuccessMsg: 'นำเข้าข้อมูลสำเร็จ',
+    importFailMsg: 'ไม่สามารถนำเข้าไฟล์ได้',
+    paymentSection: 'ช่องทางการชำระเงิน', referenceLabel: 'อ้างอิง', uploadImage: 'อัพโหลดรูป',
+    saveFirst: 'กรุณากรอกข้อมูลขั้นต่ำ (เลขที่ + ชื่อลูกค้า + อย่างน้อย 1 รายการ)'
   },
   en: {
     invoice: 'INVOICE', quotation: 'QUOTATION',
@@ -416,24 +960,67 @@ const i18n = {
     savePdf: 'Save PDF',
     billTo: 'Bill To', from: 'From',
     subtotal: 'Subtotal', discountAmt: 'Discount', vat: 'VAT (7%)', total: 'Total',
-    currency: '฿', savedMsg: 'Company info saved'
+    currency: '฿', savedMsg: 'Company info saved',
+    payment: 'Payment Info', bankAccounts: 'Bank Accounts', bankName: 'Bank',
+    accountName: 'Account Name', accountNumber: 'Account No.', branch: 'Branch',
+    addBank: '+ Add Bank', promptPay: 'PromptPay', promptPayPhone: 'Phone',
+    promptPayId: 'National ID', promptPayTax: 'Tax ID', qrCode: 'QR Code',
+    signature: 'Signature', stamp: 'Stamp', signatureStamp: 'Signature / Stamp',
+    showSignature: 'Show Signature', showStamp: 'Show Stamp',
+    docSettings: 'Document Settings', autoNumber: 'Auto Number',
+    dueTerm: 'Payment Terms', onreceipt: 'Due on Receipt', net7: 'Net 7 days', net15: 'Net 15 days',
+    net30: 'Net 30 days', net60: 'Net 60 days', custom: 'Custom',
+    validityTerm: 'Validity',
+    currencyLabel: 'Currency', vatInclusive: 'Prices include VAT',
+    withholdingTax: 'Withholding Tax', withholdingRate: 'Rate (%)',
+    netPayable: 'Net Payable',
+    newDoc: 'New', saveDoc: 'Save', history: 'History',
+    exportData: 'Export', importData: 'Import',
+    historyTitle: 'Document History', searchPlaceholder: 'Search (number / customer)',
+    noDocs: 'No saved documents yet', open: 'Open', duplicate: 'Duplicate', remove: 'Delete',
+    convertToInvoice: 'Convert to Invoice', close: 'Close',
+    confirmDelete: 'Delete this document?', confirmImport: 'This will replace ALL current data. Continue?',
+    docSavedMsg: 'Document saved', importSuccessMsg: 'Backup imported successfully',
+    importFailMsg: 'Failed to import file',
+    paymentSection: 'Payment Information', referenceLabel: 'Ref.', uploadImage: 'Upload image',
+    saveFirst: 'Please fill in minimum info (number + customer name + at least 1 item)'
   }
 };
 
 const STORAGE_KEY = 'invoiceApp.company.v1';
+const DOCS_KEY = 'invoiceApp.documents.v1';
+const COUNTERS_KEY = 'invoiceApp.counters.v1';
 
 const state = {
   docType: 'invoice',
   lang: 'th',
   docNumber: '',
+  docNumberAuto: true,
   docDate: new Date().toISOString().slice(0, 10),
+  dueTerm: 'net30',
   dueDate: '',
-  company: { name: '', address: '', phone: '', email: '', taxId: '', logoDataUrl: '' },
+  reference: '',
+  currency: 'THB',
+  vatInclusive: false,
+  company: {
+    name: '', address: '', phone: '', email: '', taxId: '',
+    logoDataUrl: '',
+    signatureDataUrl: '',
+    stampDataUrl: '',
+    qrDataUrl: '',
+    bankAccounts: [],
+    promptPay: { type: 'phone', value: '' }
+  },
   customer: { name: '', address: '', phone: '', taxId: '' },
   items: [{ description: '', qty: 1, unitPrice: 0 }],
   discountPct: 0,
   vatEnabled: false,
-  notes: ''
+  withholding: { enabled: false, rate: 3 },
+  paymentDisplay: { showBanks: true, showPromptPay: true, showQR: true },
+  showSignature: true,
+  showStamp: false,
+  notes: '',
+  currentDocId: null
 };
 
 // ---- helpers ----
@@ -443,6 +1030,16 @@ const fmt = n => Number(n || 0).toLocaleString('en-US', { minimumFractionDigits:
 const t = key => i18n[state.lang][key] || key;
 const esc = s => String(s ?? '').replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
 const nl2br = s => esc(s).replace(/\n/g, '<br>');
+const CURRENCY_SYMBOLS = { THB: '฿', USD: '$', EUR: '€', JPY: '¥', GBP: '£', CNY: '¥' };
+const currencySymbol = code => CURRENCY_SYMBOLS[code] || code;
+const fmtMoney = (amount, code) => `${currencySymbol(code || state.currency)} ${fmt(amount)}`;
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const todayISO = () => new Date().toISOString().slice(0, 10);
+const addDaysISO = (iso, days) => {
+  const d = new Date(iso);
+  d.setDate(d.getDate() + Number(days || 0));
+  return d.toISOString().slice(0, 10);
+};
 
 function setNested(obj, path, val) {
   const parts = path.split('.');
@@ -469,14 +1066,243 @@ function saveCompany() {
   alert(t('savedMsg'));
 }
 
+// ---- Document numbering ----
+function loadCounters() {
+  try {
+    const raw = localStorage.getItem(COUNTERS_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) { return {}; }
+}
+function saveCounters(counters) {
+  localStorage.setItem(COUNTERS_KEY, JSON.stringify(counters));
+}
+function nextDocNumber(docType) {
+  const prefix = docType === 'invoice' ? 'INV' : 'QUO';
+  const year = new Date().getFullYear();
+  const key = `${prefix}-${year}`;
+  const counters = loadCounters();
+  const next = (counters[key] || 0) + 1;
+  return `${key}-${String(next).padStart(4, '0')}`;
+}
+function advanceCounter(docNumber) {
+  const m = /^(INV|QUO)-(\d{4})-(\d+)$/.exec(docNumber || '');
+  if (!m) return;
+  const key = `${m[1]}-${m[2]}`;
+  const num = Number(m[3]);
+  const counters = loadCounters();
+  if ((counters[key] || 0) < num) {
+    counters[key] = num;
+    saveCounters(counters);
+  }
+}
+
+// ---- Due date / validity ----
+const DUE_TERMS = {
+  onreceipt: 0,
+  net7: 7,
+  net15: 15,
+  net30: 30,
+  net60: 60,
+  custom: null
+};
+function computeDueDate(issueDate, term) {
+  if (term === 'custom' || !DUE_TERMS.hasOwnProperty(term)) return state.dueDate || '';
+  return addDaysISO(issueDate || todayISO(), DUE_TERMS[term]);
+}
+function applyDueTerm() {
+  if (state.dueTerm !== 'custom') {
+    state.dueDate = computeDueDate(state.docDate, state.dueTerm);
+  }
+}
+
+// ---- Document history ----
+function loadDocuments() {
+  try {
+    const raw = localStorage.getItem(DOCS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) { return []; }
+}
+function saveDocuments(docs) {
+  try {
+    localStorage.setItem(DOCS_KEY, JSON.stringify(docs));
+    return true;
+  } catch (e) {
+    if (e.name === 'QuotaExceededError' || /quota/i.test(e.message || '')) {
+      alert('หน่วยความจำเต็ม กรุณาลบเอกสารเก่าออกบางส่วน\nStorage full — please delete old documents.');
+    } else {
+      alert('บันทึกไม่สำเร็จ: ' + e.message);
+    }
+    return false;
+  }
+}
+function snapshotCurrentDoc() {
+  return {
+    id: state.currentDocId || uid(),
+    docType: state.docType,
+    lang: state.lang,
+    docNumber: state.docNumber,
+    docNumberAuto: state.docNumberAuto,
+    docDate: state.docDate,
+    dueTerm: state.dueTerm,
+    dueDate: state.dueDate,
+    reference: state.reference,
+    currency: state.currency,
+    vatInclusive: state.vatInclusive,
+    customer: { ...state.customer },
+    items: state.items.map(it => ({ ...it })),
+    discountPct: state.discountPct,
+    vatEnabled: state.vatEnabled,
+    withholding: { ...state.withholding },
+    paymentDisplay: { ...state.paymentDisplay },
+    showSignature: state.showSignature,
+    showStamp: state.showStamp,
+    notes: state.notes,
+    savedAt: new Date().toISOString()
+  };
+}
+function applyDocSnapshot(doc) {
+  state.currentDocId = doc.id;
+  state.docType = doc.docType;
+  state.lang = doc.lang || state.lang;
+  state.docNumber = doc.docNumber;
+  state.docNumberAuto = !!doc.docNumberAuto;
+  state.docDate = doc.docDate;
+  state.dueTerm = doc.dueTerm || 'custom';
+  state.dueDate = doc.dueDate || '';
+  state.reference = doc.reference || '';
+  state.currency = doc.currency || 'THB';
+  state.vatInclusive = !!doc.vatInclusive;
+  state.customer = { ...{ name:'', address:'', phone:'', taxId:'' }, ...doc.customer };
+  state.items = (doc.items && doc.items.length) ? doc.items.map(it => ({ ...it })) : [{ description:'', qty:1, unitPrice:0 }];
+  state.discountPct = Number(doc.discountPct) || 0;
+  state.vatEnabled = !!doc.vatEnabled;
+  state.withholding = { enabled: false, rate: 3, ...(doc.withholding || {}) };
+  state.paymentDisplay = { showBanks: true, showPromptPay: true, showQR: true, ...(doc.paymentDisplay || {}) };
+  state.showSignature = doc.showSignature !== false;
+  state.showStamp = !!doc.showStamp;
+  state.notes = doc.notes || '';
+}
+function persistCurrentDoc() {
+  const snap = snapshotCurrentDoc();
+  const docs = loadDocuments();
+  const idx = docs.findIndex(d => d.id === snap.id);
+  if (idx >= 0) docs[idx] = snap;
+  else docs.unshift(snap);
+  if (!saveDocuments(docs)) return false;
+  if (state.docNumberAuto) advanceCounter(state.docNumber);
+  state.currentDocId = snap.id;
+  return true;
+}
+function deleteDocument(id) {
+  const docs = loadDocuments().filter(d => d.id !== id);
+  saveDocuments(docs);
+  if (state.currentDocId === id) state.currentDocId = null;
+}
+function duplicateDocument(id) {
+  const docs = loadDocuments();
+  const src = docs.find(d => d.id === id);
+  if (!src) return null;
+  const copy = JSON.parse(JSON.stringify(src));
+  copy.id = uid();
+  copy.docNumber = nextDocNumber(copy.docType);
+  copy.docNumberAuto = true;
+  copy.docDate = todayISO();
+  copy.dueDate = computeDueDate(copy.docDate, copy.dueTerm || 'net30');
+  copy.savedAt = new Date().toISOString();
+  return copy;
+}
+function convertQuotationToInvoice(id) {
+  const docs = loadDocuments();
+  const src = docs.find(d => d.id === id);
+  if (!src || src.docType !== 'quotation') return null;
+  const inv = JSON.parse(JSON.stringify(src));
+  inv.id = uid();
+  inv.docType = 'invoice';
+  inv.docNumber = nextDocNumber('invoice');
+  inv.docNumberAuto = true;
+  inv.docDate = todayISO();
+  inv.dueTerm = 'net30';
+  inv.dueDate = computeDueDate(inv.docDate, inv.dueTerm);
+  inv.reference = src.docNumber;
+  inv.savedAt = new Date().toISOString();
+  return inv;
+}
+
+// ---- Backup / Restore ----
+function exportBackup() {
+  const data = {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    company: state.company,
+    documents: loadDocuments(),
+    counters: loadCounters()
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `invoice-backup-${todayISO()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 0);
+}
+function importBackup(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(reader.result);
+        if (!data || typeof data !== 'object' || !('version' in data)) {
+          throw new Error('ไฟล์ backup ไม่ถูกต้อง / invalid backup file');
+        }
+        if (data.company) {
+          Object.assign(state.company, data.company);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state.company));
+        }
+        if (Array.isArray(data.documents)) {
+          localStorage.setItem(DOCS_KEY, JSON.stringify(data.documents));
+        }
+        if (data.counters && typeof data.counters === 'object') {
+          localStorage.setItem(COUNTERS_KEY, JSON.stringify(data.counters));
+        }
+        resolve(true);
+      } catch (e) { reject(e); }
+    };
+    reader.onerror = () => reject(reader.error);
+    reader.readAsText(file);
+  });
+}
+
 // ---- totals ----
 function computeTotals() {
-  const subtotal = state.items.reduce((s, it) => s + (Number(it.qty) || 0) * (Number(it.unitPrice) || 0), 0);
+  const VAT_RATE = 0.07;
+  const rawLineSum = state.items.reduce((s, it) => s + (Number(it.qty) || 0) * (Number(it.unitPrice) || 0), 0);
+
+  let subtotal, vat;
+  if (state.vatInclusive && state.vatEnabled) {
+    subtotal = rawLineSum / (1 + VAT_RATE);
+  } else {
+    subtotal = rawLineSum;
+  }
+
   const discountAmt = subtotal * (Number(state.discountPct) || 0) / 100;
   const afterDiscount = subtotal - discountAmt;
-  const vat = state.vatEnabled ? afterDiscount * 0.07 : 0;
+
+  if (state.vatEnabled) {
+    vat = afterDiscount * VAT_RATE;
+  } else {
+    vat = 0;
+  }
+
   const total = afterDiscount + vat;
-  return { subtotal, discountAmt, vat, total };
+
+  const withholdingRate = state.withholding && state.withholding.enabled
+    ? (Number(state.withholding.rate) || 0) / 100
+    : 0;
+  const withholding = afterDiscount * withholdingRate;
+  const netPayable = total - withholding;
+
+  return { subtotal, discountAmt, afterDiscount, vat, withholding, total, netPayable };
 }
 
 // ---- Form rendering ----
@@ -493,10 +1319,88 @@ function renderItemsForm() {
   `).join('');
 }
 
+function renderBankAccountsForm() {
+  const list = document.getElementById('bankAccountsList');
+  if (!list) return;
+  const accounts = state.company.bankAccounts || [];
+  if (accounts.length === 0) {
+    list.innerHTML = '<div style="color:var(--muted); font-size:0.85rem; padding:6px 0;">— ยังไม่มีบัญชี / no accounts —</div>';
+    return;
+  }
+  list.innerHTML = accounts.map((a, i) => `
+    <div class="grid-2" style="margin-bottom:6px; padding:8px; background:var(--bg); border-radius:6px;">
+      <div class="field"><label>${t('bankName')}</label><input type="text" value="${esc(a.bankName)}" data-bank="${i}" data-bkey="bankName"></div>
+      <div class="field"><label>${t('branch')}</label><input type="text" value="${esc(a.branch || '')}" data-bank="${i}" data-bkey="branch"></div>
+      <div class="field"><label>${t('accountName')}</label><input type="text" value="${esc(a.accountName)}" data-bank="${i}" data-bkey="accountName"></div>
+      <div class="field"><label>${t('accountNumber')}</label><input type="text" value="${esc(a.accountNumber)}" data-bank="${i}" data-bkey="accountNumber"></div>
+      <div class="field" style="grid-column: span 2; display:flex; justify-content:flex-end;">
+        <button type="button" class="btn btn-danger" data-bank-remove="${i}" style="font-size:0.8rem;">× ${t('remove')}</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderHistoryList(filter) {
+  const container = document.getElementById('historyListContainer');
+  if (!container) return;
+  const docs = loadDocuments();
+  const f = (filter || '').trim().toLowerCase();
+  const filtered = !f ? docs : docs.filter(d =>
+    (d.docNumber || '').toLowerCase().includes(f) ||
+    ((d.customer && d.customer.name) || '').toLowerCase().includes(f)
+  );
+  if (filtered.length === 0) {
+    container.innerHTML = `<div class="doc-history-empty">${t('noDocs')}</div>`;
+    return;
+  }
+  container.innerHTML = `
+    <table class="doc-history-table">
+      <thead>
+        <tr>
+          <th>${t('docNumber')}</th>
+          <th>${t('customer')}</th>
+          <th>${t('date')}</th>
+          <th>${t('total')}</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        ${filtered.map(d => {
+          const isQuote = d.docType === 'quotation';
+          const grand = (d.items || []).reduce((s, it) => s + (Number(it.qty)||0)*(Number(it.unitPrice)||0), 0);
+          const symbol = currencySymbol(d.currency || 'THB');
+          return `
+            <tr>
+              <td>${esc(d.docNumber)}${isQuote ? ' <span style="color:var(--muted);font-size:0.75rem;">QUO</span>' : ''}</td>
+              <td>${esc((d.customer && d.customer.name) || '')}</td>
+              <td>${esc(d.docDate)}</td>
+              <td>${symbol} ${fmt(grand)}</td>
+              <td class="actions">
+                <button class="btn btn-secondary" data-doc-open="${d.id}">${t('open')}</button>
+                <button class="btn btn-secondary" data-doc-dup="${d.id}">${t('duplicate')}</button>
+                ${isQuote ? `<button class="btn btn-secondary" data-doc-convert="${d.id}">${t('convertToInvoice')}</button>` : ''}
+                <button class="btn btn-danger" data-doc-del="${d.id}">${t('remove')}</button>
+              </td>
+            </tr>
+          `;
+        }).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
 function applyI18nToForm() {
   $$('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
     if (i18n[state.lang][key]) el.textContent = t(key);
+  });
+  $$('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    if (i18n[state.lang][key]) el.placeholder = t(key);
+  });
+  $$('select option[data-i18n]').forEach(opt => {
+    const key = opt.getAttribute('data-i18n');
+    if (i18n[state.lang][key]) opt.textContent = t(key);
   });
 }
 
@@ -507,56 +1411,87 @@ function syncFormFromState() {
     if (el.type === 'checkbox') el.checked = !!v;
     else el.value = v ?? '';
   });
-  if (state.company.logoDataUrl) {
-    $('#logoPreview').src = state.company.logoDataUrl;
-    $('#logoPreview').style.display = '';
-  }
+  syncImagePreview('logoPreview', state.company.logoDataUrl);
+  syncImagePreview('signaturePreview', state.company.signatureDataUrl);
+  syncImagePreview('stampPreview', state.company.stampDataUrl);
+  syncImagePreview('qrPreview', state.company.qrDataUrl);
+  renderBankAccountsForm();
+}
+function syncImagePreview(id, dataUrl) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (dataUrl) { el.src = dataUrl; el.style.display = ''; }
+  else { el.removeAttribute('src'); el.style.display = 'none'; }
 }
 
 // ---- Preview rendering ----
 function renderPreview() {
   const totals = computeTotals();
-  const lang = state.lang;
   const dueLabel = state.docType === 'invoice' ? t('dueDate') : t('expiryDate');
   const docTitle = state.docType === 'invoice' ? t('invoice') : t('quotation');
+  const eyebrow = state.docType === 'invoice' ? '— BILLING DOCUMENT —' : '— PROPOSAL DOCUMENT —';
 
-  const itemsHtml = state.items.map(it => `
+  const itemsHtml = state.items.filter(it => it.description || it.qty || it.unitPrice).map(it => `
     <tr>
-      <td>${nl2br(it.description)}</td>
+      <td>${nl2br(it.description) || '&nbsp;'}</td>
       <td>${fmt(it.qty)}</td>
       <td>${fmt(it.unitPrice)}</td>
       <td>${fmt((it.qty || 0) * (it.unitPrice || 0))}</td>
     </tr>
-  `).join('');
+  `).join('') || `<tr><td colspan="4" style="text-align:center; padding:24px; color:var(--ink-faint); font-style:italic;">— no items —</td></tr>`;
 
   const c = state.company;
   const cu = state.customer;
-  const companyMeta = [c.address, c.phone && `${t('phone')}: ${c.phone}`, c.email && `${t('email')}: ${c.email}`, c.taxId && `${t('taxId')}: ${c.taxId}`]
+  const companyMeta = [c.address, c.phone && `T  ${c.phone}`, c.email && `E  ${c.email}`, c.taxId && `${t('taxId')}  ${c.taxId}`]
     .filter(Boolean).join('\n');
-  const customerMeta = [cu.address, cu.phone && `${t('phone')}: ${cu.phone}`, cu.taxId && `${t('taxId')}: ${cu.taxId}`]
+  const customerMeta = [cu.address, cu.phone && `T  ${cu.phone}`, cu.taxId && `${t('taxId')}  ${cu.taxId}`]
     .filter(Boolean).join('\n');
 
+  const showWHT = state.withholding && state.withholding.enabled && state.currency === 'THB';
+  const referenceHtml = state.reference ? `
+    <div class="cell">
+      <div class="label">${t('referenceLabel')}</div>
+      <div class="value">${esc(state.reference)}</div>
+    </div>
+  ` : '';
+  const paymentHtml = state.docType === 'invoice' ? renderPaymentSection() : '';
+  const signatureHtml = renderSignatureBlock();
+
   $('#doc').innerHTML = `
-    <div class="doc-header">
-      <div class="left">
-        ${c.logoDataUrl ? `<img src="${c.logoDataUrl}" alt="logo">` : ''}
+    <div class="doc-hero">
+      <div class="brand">
+        ${c.logoDataUrl ? `<img src="${c.logoDataUrl}" alt="">` : ''}
         <div class="company-name">${esc(c.name) || '&nbsp;'}</div>
         <div class="company-meta">${nl2br(companyMeta)}</div>
       </div>
-      <div class="right">
+      <div class="stamp">
+        <div class="eyebrow">${eyebrow}</div>
         <div class="doc-title">${docTitle}</div>
-        <div class="doc-meta">
-          <div><span>${t('docNumber')}</span><strong>${esc(state.docNumber) || '-'}</strong></div>
-          <div><span>${t('date')}</span><strong>${esc(state.docDate) || '-'}</strong></div>
-          ${state.dueDate ? `<div><span>${dueLabel}</span><strong>${esc(state.dueDate)}</strong></div>` : ''}
-        </div>
       </div>
+    </div>
+
+    <div class="doc-meta-strip">
+      <div class="cell">
+        <div class="label">${t('docNumber')}</div>
+        <div class="value">${esc(state.docNumber) || '—'}</div>
+      </div>
+      <div class="cell">
+        <div class="label">${t('date')}</div>
+        <div class="value">${esc(state.docDate) || '—'}</div>
+      </div>
+      <div class="cell">
+        <div class="label">${dueLabel}</div>
+        <div class="value">${esc(state.dueDate) || '—'}</div>
+      </div>
+      ${referenceHtml}
     </div>
 
     <div class="billto">
       <div class="label">${t('billTo')}</div>
-      <div class="name">${esc(cu.name) || '&nbsp;'}</div>
-      <div class="meta">${nl2br(customerMeta)}</div>
+      <div class="body">
+        <div class="name">${esc(cu.name) || '&nbsp;'}</div>
+        <div class="meta">${nl2br(customerMeta)}</div>
+      </div>
     </div>
 
     <table class="doc-items">
@@ -571,19 +1506,97 @@ function renderPreview() {
       <tbody>${itemsHtml}</tbody>
     </table>
 
-    <div class="doc-totals">
-      <div class="row"><span>${t('subtotal')}</span><span>${t('currency')}${fmt(totals.subtotal)}</span></div>
-      ${state.discountPct > 0 ? `<div class="row"><span>${t('discountAmt')} (${state.discountPct}%)</span><span>-${t('currency')}${fmt(totals.discountAmt)}</span></div>` : ''}
-      ${state.vatEnabled ? `<div class="row"><span>${t('vat')}</span><span>${t('currency')}${fmt(totals.vat)}</span></div>` : ''}
-      <div class="row grand"><span>${t('total')}</span><span>${t('currency')}${fmt(totals.total)}</span></div>
+    <div class="doc-bottom">
+      ${state.notes ? `
+        <div class="doc-notes-block">
+          <div class="label">${t('notes')}</div>
+          <div class="text">${nl2br(state.notes)}</div>
+        </div>
+      ` : '<div></div>'}
+      <div class="doc-totals">
+        <div class="row"><span>${t('subtotal')}</span><span>${fmtMoney(totals.subtotal)}</span></div>
+        ${state.discountPct > 0 ? `<div class="row"><span>${t('discountAmt')} · ${state.discountPct}%</span><span>− ${fmtMoney(totals.discountAmt)}</span></div>` : ''}
+        ${state.vatEnabled ? `<div class="row"><span>${t('vat')}${state.vatInclusive ? ' (incl.)' : ''}</span><span>${fmtMoney(totals.vat)}</span></div>` : ''}
+        <div class="row grand"><span>${t('total')}</span><span>${fmtMoney(totals.total)}</span></div>
+        ${showWHT ? `<div class="row"><span>${t('withholdingTax')} · ${state.withholding.rate}%</span><span>− ${fmtMoney(totals.withholding)}</span></div>` : ''}
+        ${showWHT ? `<div class="row grand"><span>${t('netPayable')}</span><span>${fmtMoney(totals.netPayable)}</span></div>` : ''}
+      </div>
     </div>
 
-    ${state.notes ? `
-      <div class="doc-notes">
-        <div class="label">${t('notes')}</div>
-        <div class="text">${nl2br(state.notes)}</div>
+    ${paymentHtml}
+    ${signatureHtml}
+
+    <div class="doc-footer">
+      <div>${esc(c.name) || '&nbsp;'}</div>
+      <div class="ornament">✦ ✦ ✦</div>
+      <div>${docTitle} · ${esc(state.docNumber) || '—'}</div>
+    </div>
+  `;
+}
+
+function renderPaymentSection() {
+  const c = state.company;
+  const pd = state.paymentDisplay || {};
+  const banks = (c.bankAccounts || []);
+  const ppValue = c.promptPay && c.promptPay.value;
+  const qrUrl = c.qrDataUrl;
+  const showBanks = pd.showBanks !== false && banks.length > 0;
+  const showPP = pd.showPromptPay !== false && ppValue;
+  const showQR = pd.showQR !== false && qrUrl;
+  if (!showBanks && !showPP && !showQR) return '';
+
+  const banksHtml = showBanks ? `
+    <div class="bank-list">
+      <div class="label">${t('bankAccounts')}</div>
+      ${banks.map(a => `
+        <div class="bank-row">
+          <strong>${esc(a.bankName)}</strong>${a.branch ? ' · ' + esc(a.branch) : ''}<br>
+          ${esc(a.accountName)} · ${esc(a.accountNumber)}
+        </div>
+      `).join('')}
+    </div>
+  ` : '';
+
+  const ppLabel = c.promptPay && c.promptPay.type === 'phone' ? t('promptPayPhone')
+    : c.promptPay && c.promptPay.type === 'id' ? t('promptPayId')
+    : t('promptPayTax');
+  const ppHtml = showPP ? `
+    <div class="promptpay">
+      <span class="label" style="margin:0; display:inline;">${t('promptPay')}</span>
+      &nbsp;${esc(ppValue)} <span style="color:var(--muted); font-size:0.75rem;">(${ppLabel})</span>
+    </div>
+  ` : '';
+
+  const qrHtml = showQR ? `<div class="qr"><div class="label">${t('qrCode')}</div><img src="${esc(qrUrl)}" alt=""></div>` : '<div></div>';
+
+  return `
+    <div class="doc-payment">
+      <div>
+        <div class="label">${t('paymentSection')}</div>
+        ${banksHtml}
+        ${ppHtml}
       </div>
-    ` : ''}
+      ${qrHtml}
+    </div>
+  `;
+}
+
+function renderSignatureBlock() {
+  const c = state.company;
+  const showSig = state.showSignature && c.signatureDataUrl;
+  const showStamp = state.showStamp && c.stampDataUrl;
+  if (!showSig && !showStamp) return '';
+  return `
+    <div class="doc-signature">
+      <div class="sig-cell">
+        ${showSig ? `<img src="${esc(c.signatureDataUrl)}" alt="">` : '<div style="height:80px;"></div>'}
+        <div class="sig-line">${t('signature')}</div>
+      </div>
+      <div class="sig-cell">
+        ${showStamp ? `<img src="${esc(c.stampDataUrl)}" alt="">` : '<div style="height:80px;"></div>'}
+        <div class="sig-line">${t('stamp')}</div>
+      </div>
+    </div>
   `;
 }
 
@@ -657,32 +1670,209 @@ function setupListeners() {
     renderAll();
   });
 
+  // Bank accounts: add
+  $('#btnAddBank').addEventListener('click', () => {
+    if (!state.company.bankAccounts) state.company.bankAccounts = [];
+    state.company.bankAccounts.push({ bankName: '', accountName: '', accountNumber: '', branch: '' });
+    renderBankAccountsForm();
+    renderPreview();
+  });
+  // Bank accounts: edit + remove (event delegation)
+  document.addEventListener('input', (e) => {
+    const el = e.target;
+    if (el.matches('[data-bank]')) {
+      const i = Number(el.getAttribute('data-bank'));
+      const k = el.getAttribute('data-bkey');
+      if (state.company.bankAccounts && state.company.bankAccounts[i]) {
+        state.company.bankAccounts[i][k] = el.value;
+        renderPreview();
+      }
+    }
+  });
+  document.addEventListener('click', (e) => {
+    const rm = e.target.closest('[data-bank-remove]');
+    if (rm) {
+      const i = Number(rm.getAttribute('data-bank-remove'));
+      state.company.bankAccounts.splice(i, 1);
+      renderBankAccountsForm();
+      renderPreview();
+    }
+  });
+
+  // Due term: when changed, auto-compute due date (unless custom)
+  document.addEventListener('change', (e) => {
+    if (e.target.id === 'dueTermSelect') {
+      state.dueTerm = e.target.value;
+      applyDueTerm();
+      const dueInput = document.getElementById('dueDateInput');
+      if (dueInput) {
+        dueInput.value = state.dueDate;
+        dueInput.disabled = state.dueTerm !== 'custom';
+      }
+      renderPreview();
+    }
+    if (e.target.matches('[data-bind="docDate"]')) {
+      applyDueTerm();
+      const dueInput = document.getElementById('dueDateInput');
+      if (dueInput) dueInput.value = state.dueDate;
+      renderPreview();
+    }
+  });
+
+  // New document
+  $('#btnNewDoc').addEventListener('click', () => {
+    state.currentDocId = null;
+    state.docType = state.docType || 'invoice';
+    state.docNumberAuto = true;
+    state.docNumber = nextDocNumber(state.docType);
+    state.docDate = todayISO();
+    state.dueTerm = 'net30';
+    applyDueTerm();
+    state.reference = '';
+    state.customer = { name: '', address: '', phone: '', taxId: '' };
+    state.items = [{ description: '', qty: 1, unitPrice: 0 }];
+    state.discountPct = 0;
+    state.notes = '';
+    state.withholding = { enabled: false, rate: 3 };
+    syncFormFromState();
+    renderItemsForm();
+    const dueInput = document.getElementById('dueDateInput');
+    if (dueInput) dueInput.disabled = state.dueTerm !== 'custom';
+    renderPreview();
+  });
+  // Save document
+  $('#btnSaveDoc').addEventListener('click', () => {
+    if (!state.docNumber || !state.customer.name || state.items.every(it => !it.description && !it.qty && !it.unitPrice)) {
+      alert(t('saveFirst'));
+      return;
+    }
+    if (persistCurrentDoc()) {
+      alert(t('docSavedMsg'));
+    }
+  });
+
+  // History modal
+  $('#btnHistory').addEventListener('click', () => {
+    renderHistoryList(document.getElementById('historySearch').value);
+    document.getElementById('historyModal').classList.add('open');
+  });
+  $('#btnHistoryClose').addEventListener('click', () => {
+    document.getElementById('historyModal').classList.remove('open');
+  });
+  document.getElementById('historyModal').addEventListener('click', (e) => {
+    if (e.target.id === 'historyModal') {
+      e.target.classList.remove('open');
+    }
+  });
+  $('#historySearch').addEventListener('input', (e) => {
+    renderHistoryList(e.target.value);
+  });
+  document.getElementById('historyListContainer').addEventListener('click', (e) => {
+    const open = e.target.closest('[data-doc-open]');
+    const dup = e.target.closest('[data-doc-dup]');
+    const del = e.target.closest('[data-doc-del]');
+    const conv = e.target.closest('[data-doc-convert]');
+    if (open) {
+      const doc = loadDocuments().find(d => d.id === open.getAttribute('data-doc-open'));
+      if (doc) {
+        applyDocSnapshot(doc);
+        syncFormFromState();
+        renderItemsForm();
+        renderPreview();
+        document.getElementById('historyModal').classList.remove('open');
+      }
+    } else if (dup) {
+      const copy = duplicateDocument(dup.getAttribute('data-doc-dup'));
+      if (copy) {
+        applyDocSnapshot(copy);
+        state.currentDocId = copy.id;
+        syncFormFromState();
+        renderItemsForm();
+        renderPreview();
+        document.getElementById('historyModal').classList.remove('open');
+      }
+    } else if (conv) {
+      const inv = convertQuotationToInvoice(conv.getAttribute('data-doc-convert'));
+      if (inv) {
+        applyDocSnapshot(inv);
+        state.currentDocId = inv.id;
+        syncFormFromState();
+        renderItemsForm();
+        renderPreview();
+        document.getElementById('historyModal').classList.remove('open');
+      }
+    } else if (del) {
+      if (confirm(t('confirmDelete'))) {
+        deleteDocument(del.getAttribute('data-doc-del'));
+        renderHistoryList(document.getElementById('historySearch').value);
+      }
+    }
+  });
+
+  // Export backup
+  $('#btnExport').addEventListener('click', exportBackup);
+  // Import backup
+  $('#btnImport').addEventListener('click', () => $('#importInput').click());
+  $('#importInput').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!confirm(t('confirmImport'))) { e.target.value = ''; return; }
+    importBackup(file).then(() => {
+      loadCompany();
+      syncFormFromState();
+      renderItemsForm();
+      renderPreview();
+      alert(t('importSuccessMsg'));
+    }).catch(err => {
+      alert(t('importFailMsg') + ': ' + err.message);
+    }).finally(() => { e.target.value = ''; });
+  });
+
   // Save company
   $('#btnSaveCompany').addEventListener('click', saveCompany);
 
   // Print
   $('#btnPrint').addEventListener('click', () => window.print());
 
-  // Logo upload
-  $('#logoInput').addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      state.company.logoDataUrl = reader.result;
-      $('#logoPreview').src = reader.result;
-      $('#logoPreview').style.display = '';
-      renderPreview();
-    };
-    reader.readAsDataURL(file);
-  });
+  // Image uploads (logo, signature, stamp, QR)
+  function wireImageUpload(inputId, previewId, stateField) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    input.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (file.size > 2 * 1024 * 1024) {
+        alert('ไฟล์ใหญ่เกิน 2MB / file too large (max 2MB)');
+        e.target.value = '';
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        state.company[stateField] = reader.result;
+        const img = document.getElementById(previewId);
+        if (img) { img.src = reader.result; img.style.display = ''; }
+        renderPreview();
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+  wireImageUpload('logoInput', 'logoPreview', 'logoDataUrl');
+  wireImageUpload('signatureInput', 'signaturePreview', 'signatureDataUrl');
+  wireImageUpload('stampInput', 'stampPreview', 'stampDataUrl');
+  wireImageUpload('qrInput', 'qrPreview', 'qrDataUrl');
 }
 
 // ---- Init ----
 loadCompany();
+if (!state.docNumber) {
+  state.docNumber = nextDocNumber(state.docType);
+}
+applyDueTerm();
 syncFormFromState();
 renderItemsForm();
 setupListeners();
+const initialDueInput = document.getElementById('dueDateInput');
+if (initialDueInput) initialDueInput.disabled = state.dueTerm !== 'custom';
 renderAll();
 </script>
 </body>
